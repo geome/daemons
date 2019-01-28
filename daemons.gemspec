@@ -21,9 +21,9 @@ Gem::Specification.new do |s|
     monitoring and automatic restarting of your processes if they crash.
   EOF
 
-  s.metadata = {
-    "documentation_uri" => "http://www.rubydoc.info/gems/daemons",
-  }
+  # s.metadata = {
+  #   "documentation_uri" => "http://www.rubydoc.info/gems/daemons",
+  # }
   
   s.files = `git ls-files README.md LICENSE Releases lib examples`.split
 

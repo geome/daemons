@@ -76,8 +76,6 @@ module Daemonize
 
       close_io
 
-      redirect_io(logfile_name)
-
       # Split rand streams between spawning and daemonized process
       srand
 
@@ -109,8 +107,6 @@ module Daemonize
 
     close_io
 
-    redirect_io(logfile_name)
-
     # Split rand streams between spawning and daemonized process
     srand
 
@@ -134,35 +130,4 @@ module Daemonize
     end
   end
   module_function :close_io
-
-  # Free $stdin/$stdout/$stderr file descriptors and
-  # point them somewhere sensible
-  def redirect_io(logfile_name)
-    begin; $stdin.reopen '/dev/null'; rescue ::Exception; end
-
-    if logfile_name == 'SYSLOG'
-      # attempt to use syslog via syslogio
-      begin
-        require 'syslogio'
-        $stdout = ::Daemons::SyslogIO.new($0, :local0, :info, $stdout)
-        $stderr = ::Daemons::SyslogIO.new($0, :local0, :err, $stderr)
-        # error out early so we can fallback to null
-        $stdout.puts "no logfile provided, output redirected to syslog"
-      rescue ::Exception
-        # on unsupported platforms simply reopen /dev/null
-        begin; $stdout.reopen '/dev/null'; rescue ::Exception; end
-        begin; $stderr.reopen '/dev/null'; rescue ::Exception; end
-      end
-    elsif logfile_name
-      $stdout.reopen logfile_name, 'a'
-      File.chmod(0644, logfile_name)
-      $stdout.sync = true
-      begin; $stderr.reopen $stdout; rescue ::Exception; end
-      $stderr.sync = true
-    else
-      begin; $stdout.reopen '/dev/null'; rescue ::Exception; end
-      begin; $stderr.reopen '/dev/null'; rescue ::Exception; end
-    end
-  end
-  module_function :redirect_io
 end
